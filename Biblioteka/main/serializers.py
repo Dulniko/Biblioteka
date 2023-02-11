@@ -5,16 +5,25 @@ class AuthorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Author
         fields = ('id', 'first_name', 'last_name')
-        
-    def create(self, validated_data):
-        author = Author.objects.create(**validated_data)
-        return author
+
+#tymczasowo // zmiana na model z słownikiem     
+GENRE_CHOICES = (
+    ('action', 'Action'),
+    ('adventure', 'Adventure'),
+    ('drama', 'Drama'),
+    ('fantasy', 'Fantasy'),
+    ('mystery', 'Mystery'),
+    ('romance', 'Romance'),
+    ('sci-fi', 'Sci-Fi'),
+    ('thriller', 'Thriller'),
+    )  
+
 class BookSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     title = serializers.CharField(max_length=255)
     author = AuthorSerializer()
-    ISBN = serializers.CharField(max_length=13)
-    genre = serializers.CharField(max_length=255)
+    isbn = serializers.CharField(max_length=13)
+    genre = serializers.ChoiceField(choices=GENRE_CHOICES)
     publication_date = serializers.DateField()
     publisher = serializers.CharField(max_length=255)
 
