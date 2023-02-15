@@ -27,11 +27,6 @@ class BookSerializer(serializers.Serializer):
     publication_date = serializers.DateField()
     publisher = serializers.CharField(max_length=255)
 
-    def create(self, validated_data):
-        author_data = validated_data.pop('author')
-        author = AuthorSerializer.create(AuthorSerializer(), validated_data=author_data)
-        book = Book.objects.create(author=author, **validated_data)
-        return book
 
 
 class LoanSerializer(serializers.Serializer):
