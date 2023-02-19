@@ -12,8 +12,15 @@ class Book(models.Model):
     publication_date = models.DateField()
     publisher = models.CharField(max_length=255)
 
+class Customer(models.Model):
+    first_name = models.CharField(max_length=255)
+    last_name = models.CharField(max_length=255)
+
 class Loan(models.Model):
     book = models.ForeignKey(Book, on_delete=models.CASCADE)
-    borrower = models.CharField(max_length=255)
+    borrower = models.ForeignKey(Customer, on_delete=models.CASCADE)
     loan_date = models.DateField()
     return_date = models.DateField()
+
+
+    

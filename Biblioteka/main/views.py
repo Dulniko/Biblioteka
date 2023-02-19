@@ -1,6 +1,6 @@
 from django.shortcuts import render
-from .serializers import BookSerializer, AuthorSerializer, LoanSerializer
-from .models import Book, Author, Loan
+from .serializers import BookSerializer, AuthorSerializer, LoanSerializer, CustomerSerializer
+from .models import Book, Author, Loan, Customer
 from rest_framework import viewsets
 
 class BookViewSet(viewsets.ModelViewSet):
@@ -14,3 +14,7 @@ class AuthorViewSet(viewsets.ModelViewSet):
 class LoanViewSet(viewsets.ModelViewSet):
     queryset = Loan.objects.all()
     serializer_class = LoanSerializer
+
+class CustomerViewSet(viewsets.ModelViewSet):
+    queryset = Customer.objects.all()
+    serializer_class = CustomerSerializer

@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from main.models import Author, Book, Loan
+from main.models import Author, Book, Loan, Customer
 
 class AuthorSerializer(serializers.ModelSerializer):
     class Meta:
@@ -36,20 +36,19 @@ class BookSerializer(serializers.Serializer):
     def create(self, validated_data):
         return Book.objects.create(**validated_data)
 
-
-
-class LoanSerializer(serializers.Serializer):
-    id = serializers.IntegerField()
-    book_id = serializers.IntegerField()
-    borrower = serializers.CharField(max_length=255)
-    loan_date = serializers.DateField()
-    return_date = serializers.DateField()
+class LoanSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Loan
+        fields = ['id', 'book', 'borrower', 'loan_date', 'return_date']
 
     def validate(self, data):
-        book_id = data.get('book_id')
-        if book_id and not Book.objects.filter(id=book_id).exists():
-            raise serializers.ValidationError('Invalid author_id.')
+        book = data.get('book')
+        if book and not Book.objects.filter(id=book.id).exists():
+            raise serializers.ValidationError('Invalid book.')
         return data
 
-    def create(self, validated_data):
-        return Loan.objects.create(**validated_data)
+
+class CustomerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Customer
+        fields = ('id', 'first_name', 'last_name')
