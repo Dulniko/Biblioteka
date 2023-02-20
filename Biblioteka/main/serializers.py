@@ -5,8 +5,7 @@ class AuthorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Author
         fields = ('id', 'first_name', 'last_name')
-
-#tymczasowo // zmiana na model z słownikiem     
+    
 GENRE_CHOICES = (
     ('action', 'Action'),
     ('adventure', 'Adventure'),
@@ -22,11 +21,12 @@ class BookSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     title = serializers.CharField(max_length=255)
     author_id = serializers.IntegerField()
+    author_name = serializers.SerializerMethodField()
     isbn = serializers.CharField(max_length=13)
     genre = serializers.ChoiceField(choices=GENRE_CHOICES)
     publication_date = serializers.DateField()
     publisher = serializers.CharField(max_length=255)
-
+    
     def validate(self, data):
         author_id = data.get('author_id')
         if author_id and not Author.objects.filter(id=author_id).exists():
@@ -36,16 +36,20 @@ class BookSerializer(serializers.Serializer):
     def create(self, validated_data):
         return Book.objects.create(**validated_data)
 
+    def get_author_name(self, obj):
+        author = Author.objects.get(id=obj.author_id)
+        return f"{author.first_name} {author.last_name}"
+
 class LoanSerializer(serializers.ModelSerializer):
+    title = serializers.CharField(source='book.title', read_only=True)
+    borrower_name = serializers.SerializerMethodField()
     class Meta:
         model = Loan
-        fields = ['id', 'book', 'borrower', 'loan_date', 'return_date']
+        fields = ('id', 'book', "title", 'borrower', "borrower_name", 'loan_date', 'return_date')
 
-    def validate(self, data):
-        book = data.get('book')
-        if book and not Book.objects.filter(id=book.id).exists():
-            raise serializers.ValidationError('Invalid book.')
-        return data
+    def get_borrower_name(self, obj):
+        return f"{obj.borrower.first_name} {obj.borrower.last_name}"
+
 
 
 class CustomerSerializer(serializers.ModelSerializer):
