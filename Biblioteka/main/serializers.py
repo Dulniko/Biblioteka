@@ -18,7 +18,7 @@ GENRE_CHOICES = (
     )  
 
 class BookSerializer(serializers.Serializer):
-    id = serializers.IntegerField()
+    id = serializers.IntegerField(read_only=True)
     title = serializers.CharField(max_length=255)
     author_id = serializers.IntegerField()
     author_name = serializers.SerializerMethodField()
