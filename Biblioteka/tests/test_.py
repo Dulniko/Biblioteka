@@ -19,7 +19,8 @@ def book(author):
         isbn='1234567890123',
         genre='sci-fi',
         publication_date='2022-02-20',
-        publisher='Test publisher'
+        publisher='Test publisher',
+        is_available = True
     )
     return book
 
@@ -58,7 +59,8 @@ def test_book_creation(author):
         'isbn': '1234567890123',
         'genre': 'sci-fi',
         'publication_date': '2022-02-20',
-        'publisher': 'Test publisher'
+        'publisher': 'Test publisher',
+        'is_available' : True
     }
     response = client.post(url, data, format='json')
 
@@ -73,7 +75,8 @@ def test_book_creation(author):
         'isbn': '1234567890123',
         'genre': 'sci-fi',
         'publication_date': datetime.date(2022, 2, 20),
-        'publisher': 'Test publisher'
+        'publisher': 'Test publisher',
+        'is_available' : True
     }
     assert book == expected_data
    

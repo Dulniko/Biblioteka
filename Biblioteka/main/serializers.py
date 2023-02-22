@@ -26,6 +26,7 @@ class BookSerializer(serializers.Serializer):
     genre = serializers.ChoiceField(choices=GENRE_CHOICES)
     publication_date = serializers.DateField()
     publisher = serializers.CharField(max_length=255)
+    is_available = serializers.BooleanField(read_only=True)
     
     def validate(self, data):
         author_id = data.get('author_id')
@@ -46,6 +47,20 @@ class LoanSerializer(serializers.ModelSerializer):
     class Meta:
         model = Loan
         fields = ('id', 'book', "title", 'borrower', "borrower_name", 'loan_date', 'return_date')
+
+    def validate(self, data):
+        book = data.get('book')
+
+        if not book.is_available:
+            raise serializers.ValidationError('Book is not available for loan.')
+        return data
+
+    def create(self, validated_data):
+        book = validated_data.pop('book')
+        loan = Loan.objects.create(book=book, **validated_data)
+        book.is_available = False
+        book.save()
+        return loan
 
     def get_borrower_name(self, obj):
         return f"{obj.borrower.first_name} {obj.borrower.last_name}"

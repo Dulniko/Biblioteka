@@ -11,6 +11,7 @@ class Book(models.Model):
     genre = models.CharField(max_length=255)
     publication_date = models.DateField()
     publisher = models.CharField(max_length=255)
+    is_available = models.BooleanField(default=True)
 
 class Customer(models.Model):
     first_name = models.CharField(max_length=255)
