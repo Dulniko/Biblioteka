@@ -7,6 +7,10 @@ from main.serializers import AuthorSerializer, BookSerializer, LoanSerializer, C
 from unittest.mock import ANY
 import datetime
 
+
+#fixture
+
+
 @pytest.fixture
 def author():
     return Author.objects.create(first_name='TestName', last_name='TestLastName')
@@ -31,6 +35,20 @@ def customer():
         last_name='TestCustomerLastName'
     )
     return customer
+
+@pytest.fixture
+def loan(book, customer):
+    loan = Loan.objects.create(
+        book = book,
+        borrower = customer,
+        loan_date = '2022-02-20',
+        return_date = '2022-02-21'
+    )
+    return loan
+
+
+#creation
+
 
 @pytest.mark.django_db
 def test_author_creation():
@@ -107,7 +125,7 @@ def test_loan_creation(book, customer):
         'return_date' : '2022-02-21'
     }
     response = client.post(url, data, format='json')
-    
+
     assert response.status_code == 201
 
     loan = Loan.objects.values().get(id=response.json()["id"])
@@ -121,3 +139,45 @@ def test_loan_creation(book, customer):
     }
 
     assert loan == expected_data
+
+
+#delete
+
+
+@pytest.mark.django_db
+def test_loan_delete(loan):
+    client = APIClient()
+    
+    url = reverse('loans-detail',args=[loan.id])
+    
+    response = client.delete(url)
+    assert response.status_code == 204
+    assert not Loan.objects.filter(id=loan.id).exists()
+
+
+#loan things
+
+
+@pytest.mark.django_db
+def test_loan_book(customer, book):
+    client = APIClient()
+    url = reverse('loans-list')
+    data = {
+        'book' : book.id,
+        'borrower' : customer.id,
+        'loan_date' : '2022-02-20',
+        'return_date' : '2022-02-21'
+    }
+    response = client.post(url, data, format='json')
+    assert response.status_code == 201
+    assert Book.objects.get(id=book.id).is_available == False
+
+@pytest.mark.django_db
+def test_loan_return(loan, book):
+    client = APIClient()
+    url = reverse('loans-detail',args=[loan.id])
+    response = client.delete(url)
+    assert response.status_code == 204
+    assert not Loan.objects.filter(id=loan.id).exists()
+    assert Book.objects.get(id=book.id).is_available == True
+    
