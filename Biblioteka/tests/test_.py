@@ -148,11 +148,41 @@ def test_loan_creation(book, customer):
 def test_loan_delete(loan):
     client = APIClient()
     
-    url = reverse('loans-detail',args=[loan.id])
+    url = reverse('loans-detail', args=[loan.id])
     
     response = client.delete(url)
     assert response.status_code == 204
     assert not Loan.objects.filter(id=loan.id).exists()
+
+@pytest.mark.django_db
+def test_customer_delete(customer):
+    client = APIClient()
+    
+    url = reverse('customer-detail', args=[customer.id])
+
+    response = client.delete(url)
+    assert response.status_code == 204
+    assert not Customer.objects.filter(id=customer.id).exists()
+
+@pytest.mark.django_db
+def test_book_delete(book):
+    client = APIClient()
+    
+    url = reverse('books-detail', args=[book.id])
+
+    response = client.delete(url)
+    assert response.status_code == 204
+    assert not Book.objects.filter(id=book.id).exists()
+
+@pytest.mark.django_db
+def test_author_delete(author):
+    client = APIClient()
+    
+    url = reverse('author-detail', args=[author.id])
+
+    response = client.delete(url)
+    assert response.status_code == 204
+    assert not Author.objects.filter(id=author.id).exists()
 
 
 #loan things
